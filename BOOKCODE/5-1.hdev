@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="22.05.0.0">
+<procedure name="main">
+<interface/>
+<body>
+<c>*透视形变，图像矫正</c>
+<c>*1、读取图像并分割</c>
+<c>*2、获取形变区域轮廓，计算顶点坐标</c>
+<c>*3、计算投影矩阵</c>
+<c>*4、投影变换</c>
+<c>*</c>
+<c></c>
+<c>*关闭当前显示窗口，清空屏幕</c>
+<l>dev_close_window ()</l>
+<c>*读取测试图像</c>
+<l>read_image (Image_display, 'data/display.jpg')</l>
+<c>*将图像转化为灰度图像</c>
+<l>rgb1_to_gray (Image_display, GrayImage)</l>
+<c>*获取图像的尺寸</c>
+<l>get_image_size(Image_display,imageWidth, imageHeight)</l>
+<c>*新建显示窗口，适应图像尺寸</c>
+<l>dev_open_window (0, 0, imageWidth, imageHeight, 'black', WindowHandle1)</l>
+<l>dev_display (GrayImage)</l>
+<c>*初始化角点坐标</c>
+<l>XCoordCorners := []</l>
+<l>YCoordCorners := []</l>
+<c>*阈值处理，提取较暗的区域</c>
+<l>threshold(GrayImage,DarkRegion,0, 80)</l>
+<c>*分离不相连的区域   连通域对应oepncv  int number = connectedComponentsWithStats(riceBW, out, stats,centroids,8,CV_16U);</c>
+<l>connection (DarkRegion, ConnectedRegions)</l>
+<c>*选择面积最大的暗色区域，即屏幕区域</c>
+<l>select_shape_std (ConnectedRegions, displayRegion, 'max_area', 70)</l>
+<c>*裁剪屏幕区域   求图像与连通域的交集</c>
+<l>reduce_domain (GrayImage, displayRegion, displayImage)</l>
+<c>*创建边缘轮廓</c>
+<l>gen_contour_region_xld (displayRegion, Contours, 'border')</l>
+<c>*将轮廓分割为边  将XLD轮廓分割成线段和圆弧或椭圆弧</c>
+<l>segment_contours_xld (Contours, ContoursSplit, 'lines', 5, 4, 2)</l>
+<c>*获取边的数量</c>
+<l>count_obj (ContoursSplit, Number)</l>
+<c>*存储每条边的起点位置</c>
+<l>for index:=1 to Number by 1</l>
+<c>*     从对象元组中选择对象</c>
+<l>   select_obj(ContoursSplit, ObjectCurrent, index)</l>
+<c>   *拟合每条边  通过线段近似XLD轮廓</c>
+<c>*    itLineContourXld通过线段近似XLD等高线。它不执行输入轮廓的分割。</c>
+<c>*     因此，我们必须确保每个轮廓对应于一个且只有一个线段。对于每个轮廓，</c>
+<c>*     算子返回起始点(RowBegin, ColBegin)，结束点(RowEnd, ColEnd)，</c>
+<c>*     以及由直线的法向量(Nr, Nc)及其到原点的距离Dist给出的轮廓的回归线，即直线方程由nr x + n cy - dist = 0</c>
+<l>   fit_line_contour_xld (ObjectCurrent, 'tukey', -1, 0, 5, 2, RowBegin, ColBegin, RowEnd, ColEnd, Nr, Nc, Dist)</l>
+<c>   *存储每条边的顶点x坐标     tuple_concat 将两个元组连接到一个新元组</c>
+<l>   tuple_concat (XCoordCorners, RowBegin, XCoordCorners)</l>
+<c>   *存储每条边的顶点y坐标     tuple_concat 将两个元组连接到一个新元组</c>
+<l>   tuple_concat (YCoordCorners, ColBegin, YCoordCorners)</l>
+<l>endfor</l>
+<c></c>
+<c>* 投影变换给四个特征点与校正后的坐标建立关联</c>
+<l>XOff:= 100</l>
+<l>YOff:= 100*imageHeight/imageWidth</l>
+<l>xTrans := [XOff,imageWidth-XOff,imageWidth-XOff,XOff]</l>
+<l>yTrans := [YOff,YOff,imageHeight-YOff,imageHeight-YOff]</l>
+<l>* 用给定的点对应计算齐次变换矩阵</l>
+<l>hom_vector_to_proj_hom_mat2d (XCoordCorners, YCoordCorners, [1,1,1,1], yTrans, xTrans, [1,1,1,1], 'normalized_dlt', HomMat2D)</l>
+<c>*投影变换   </c>
+<l>projective_trans_image (Image_display, Image_rectified, HomMat2D, 'bilinear', 'false', 'false')</l>
+<c>* 显示校正结果</c>
+<l>dev_display (Image_rectified)</l>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>
