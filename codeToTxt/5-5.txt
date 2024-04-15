@@ -1,0 +1,4 @@
+read_image (boardtext, 'calinderdata/text.jpg')
+emphasize (boardtext, ImageEmphasize, 10, 10, 1.5)
+dev_display(ImageEmphasize)
+

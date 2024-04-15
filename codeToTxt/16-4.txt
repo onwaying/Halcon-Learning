@@ -1,0 +1,26 @@
+*关闭当前窗口
+dev_close_window ()
+read_image (Image, 'data/cloth4')
+get_image_size (Image, Width, Height)
+dev_open_window (0, 0, Width/2, Height/2, 'black', WindowHandle)
+dev_set_line_width (4)
+*创建两个高斯滤波器
+gen_gauss_filter (GaussFilter1, 30.0, 30.0, 0.0, 'none', 'rft', Width, Height) 
+gen_gauss_filter (GaussFilter2,3.0, 3.0, 0.0, 'none', 'rft', Width, Height) 
+sub_image (GaussFilter1, GaussFilter2, Filter, 1, 0) 
+rgb1_to_gray (Image, ImageGray)
+*对图像进行傅里叶变换，滤波以及还原
+rft_generic (ImageGray, ImageFFT, 'to_freq', 'none', 'complex', Width)
+convol_fft (ImageFFT, Filter, ImageConvol)
+rft_generic (ImageConvol, ImageFiltered, 'from_freq', 'n', 'real', Width)
+scale_image_range (ImageFiltered, ImageScaled, 0, 255) 
+*使用形态学方法提取污染区域
+threshold (ImageScaled, Region, 0, 1) 
+erosion_circle (Region, RegionErosion, 11.5)
+connection (RegionErosion, ConnectedRegions)
+select_shape_std (ConnectedRegions, SelectedRegions, 'max_area', 70)
+dilation_circle (SelectedRegions, RegionDirty, 9.5)
+*显示提取结果
+dev_display (Image)
+dev_set_draw ('margin')
+dev_display (RegionDirty)

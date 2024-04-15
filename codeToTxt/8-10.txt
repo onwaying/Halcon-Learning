@@ -1,0 +1,12 @@
+read_image (ImageColor, 'data/village.jpg')
+*将原始图像转换为灰度图像作为形态学处理的输入
+rgb1_to_gray (ImageColor, Image)
+*进行灰度图像腐蚀操作
+gray_erosion_shape (Image, ImageMin, 11, 11, 'octagon')
+*进行灰度图像膨胀操作
+gray_dilation_shape (Image, ImageMax, 11, 11, 'octagon')
+*进行灰度图像开运算操作
+gray_opening_shape (Image, ImageOpening, 7, 7, 'octagon')
+*进行灰度图像闭运算操作
+gray_closing_shape (Image, ImageClosing, 7, 7, 'octagon')
+

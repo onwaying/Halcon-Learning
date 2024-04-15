@@ -1,0 +1,35 @@
+dev_close_window ()
+*读取图片
+read_image(Image, 'data/holes')
+*设置窗口属性，为了获取窗口句柄，供后面显示文字用
+get_image_size (Image, Width, Height)
+*创建新窗口
+dev_open_window (0, 0, Width, Height, 'black', WindowID)
+*将图像转化为单通道灰度图
+rgb1_to_gray (Image, GrayImage)
+*创建矩形选区，选择感兴趣部分
+gen_rectangle1 (Rectangle, 180, 83, 371, 522)
+reduce_domain (GrayImage, Rectangle, ROI)
+*阈值处理，提取图中深色部分，也就是文字部分，这里阈值设置为50，基本可以取出所有黑色文字
+threshold ( ROI, Region, 0, 80)
+*gen_image_proto (ImageReduced, ImageCleared, 0)
+*dev_display (Region)
+*提取中的整个区域中将不相连的部分分割成独立的区域
+connection (Region, ConnectedRegions)
+*获取不相连的区域的数量
+count_obj (ConnectedRegions, Num)
+*计算所有不相连区域的面积和中心点坐标。Area表示面积, Row和 Column分别表示中心点坐标
+area_center (ConnectedRegions, Area, Row, Column)
+*打印各区域的面积
+for i := 1 to Num by 1
+    dev_set_color ('red')
+	select_obj (ConnectedRegions, ObjectSelected, i)
+	*设定了输出文字的起始坐标点
+	set_tposition (WindowID, Row[i - 1]+40, Column[i - 1])
+	*设置打印文字的颜色
+	dev_set_color ('blue')
+	*设置字体
+    set_font (WindowID, '-System-32-*-*-0-0-0-1-GB2312_CHARSET-')
+    *输出文字内容，即该区域的面积
+	write_string (WindowID, Area[i-1])
+endfor

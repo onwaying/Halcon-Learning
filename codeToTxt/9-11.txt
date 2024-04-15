@@ -1,0 +1,42 @@
+dev_close_window ()
+*读取输入的图片
+read_image (Image, 'data/board')
+*将输入的彩色图像转为黑白图像
+rgb1_to_gray (Image, GrayImage)
+get_image_size (GrayImage, Width, Height)
+*创建一个与输入图像同样大小的窗口
+dev_open_window (0, 0, Width/4, Height/4, 'black', WindowID)
+*设定画笔宽度
+dev_set_line_width (5)
+*创建两个窗口用于显示参数计算的结果
+dev_open_window (0, 512, 320, 320, 'black', WindowID1)
+dev_open_window (512, 512, 320, 320, 'black', WindowID2)
+*分别设置两个矩阵，选择不同的两部分区域
+gen_rectangle1 (Rectangle1, 200,10, 380, 190)
+gen_rectangle1 (Rectangle2, 580, 650, 730, 800)
+*分别对两个矩形求取灰度共生矩阵Matrix1和Matrix2
+gen_cooc_matrix (Rectangle1, GrayImage, Matrix1, 6, 0)
+gen_cooc_matrix (Rectangle2, GrayImage, Matrix2, 6, 0)
+*分别对Matrix1和Matrix2提取灰度特征参数
+cooc_feature_matrix (Matrix1, Energy1, Correlation1, Homogeneity1, Contrast1)
+cooc_feature_matrix (Matrix2, Energy2, Correlation2, Homogeneity2, Contrast2)
+*采取另一种方式，直接对矩阵2的图像求灰度特征参数，结果与上面两步计算出的参数是一致的
+cooc_feature_image (Rectangle2, GrayImage, 6, 0, Energy3, Correlation3, Homogeneity3, Contrast3)
+*显示图像窗口和两个矩形的灰度共生矩阵
+dev_set_window (WindowID)
+dev_set_draw ('margin')
+dev_display (GrayImage)
+dev_display (Rectangle1)
+dev_set_color('yellow')
+dev_display (Rectangle2)
+dev_set_window (WindowID1)
+dev_display (Matrix1)
+*以字符串的形式，分别在两个矩阵的对应窗口上显示灰度特征值的计算结果
+String := ['Energy: ','Correlation: ','Homogeneity: ','Contrast: ']
+dev_set_color('red')
+disp_message (WindowID1, String$'-14s' + [Energy1,Correlation1,Homogeneity1,Contrast1]$'6.3f', 'window', 12, 12, 'white', 'false')
+dev_set_window (WindowID2)
+dev_display (Matrix2)
+dev_set_color('yellow')
+String := ['Energy: ','Correlation: ','Homogeneity: ','Contrast: ']
+disp_message (WindowID2, String$'-14s' + [Energy2,Correlation2,Homogeneity2,Contrast2]$'6.3f', 'window', 12, 12, 'white', 'false')

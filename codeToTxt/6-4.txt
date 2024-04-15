@@ -1,0 +1,4 @@
+read_image (Image, 'data/codes.jpg')
+rgb1_to_gray (Image, GrayImage)
+binary_threshold (GrayImage, RegionMaxSeparabilityLight, 'max_separability', 'dark', UsedThreshold)
+

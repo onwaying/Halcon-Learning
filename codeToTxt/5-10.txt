@@ -1,0 +1,5 @@
+read_image (ImageNoise, 'data/marker.jpg')
+gauss_filter(ImageNoise, ImageGauss, 5)
+dev_display(ImageGauss)
+
+

@@ -1,0 +1,8 @@
+read_image (Image, 'data/board')
+rgb1_to_gray (Image, GrayImage)
+threshold (GrayImage, Region, 100, 255)
+gen_image_proto (GrayImage, ImageCleared, 0)
+erosion_circle (Region, RegionErosion, 7.5)
+erosion_circle (RegionErosion, RegionErosion2, 6.5)
+dev_clear_window ()
+dev_display (RegionErosion2)

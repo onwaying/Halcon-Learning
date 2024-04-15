@@ -1,0 +1,16 @@
+*读取待检测的图像
+read_image (Image,'data/board') 
+*将图像转换为单通道的灰度图像
+rgb1_to_gray(Image, GrayImage)
+*创建矩形区域
+gen_rectangle1 (Rectangle, 259, 87, 957, 909)
+*进行裁剪，将感兴趣区域单独提取出来
+reduce_domain (GrayImage, Rectangle, ImageReduced)
+*使用阈值处理将灰度值于设定的像素选取出来
+threshold(ImageReduced,Light,85,255)
+*创建圆形结构元素，用于开运算
+gen_circle(StructElement,6,6,7)
+*进行开运算去除背景中的杂点
+opening(Light,StructElement,Large)
+dev_clear_window ()
+dev_display (Large)

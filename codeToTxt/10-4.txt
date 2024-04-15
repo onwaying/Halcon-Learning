@@ -1,0 +1,3 @@
+read_image (Image, 'data/flower')
+laplace (Image, ImageLaplace, 'signed', 11, 'n_8_isotropic')
+zero_crossing (ImageLaplace, RegionCrossing)

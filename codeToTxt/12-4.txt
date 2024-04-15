@@ -1,0 +1,68 @@
+*关闭当前窗口
+dev_close_window ()
+*创建新窗口
+dev_open_window (0, 0, 512, 512, 'black', WindowHandle)
+*设置绘制形状的方式
+dev_set_draw ('margin')
+dev_set_line_width (3)
+*创建mlp分类器，特征数为1，输出类为2个，输出方法选择‘softmax’用于分类
+create_class_mlp (1, 1, 2, 'softmax', 'normalization', 3, 42, MLPHandle)
+*创建训练样本图像与其分类的对应关系
+*图像和分类名称一一对应
+FileNames := ['m1','m2','m3','m4']
+Classes := [0,0,1,1]
+for J := 0 to |FileNames| - 1 by 1
+	*读取训练图像
+	read_image (Image, 'data/' + FileNames[J])
+	dev_display (Image)
+	*对图像进行分割
+    rgb1_to_gray (Image, GrayImage)
+    threshold (GrayImage, darkRegion, 0, 105)
+    connection (darkRegion, ConnectedRegions)
+    select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', 2000, 99999)
+	fill_up (SelectedRegions, Objects)
+	dev_display (Objects)
+	disp_message (WindowHandle, 'Add Sample ' + J + ', Class Index ' + Classes[J], 'window', 10, 10, 'black', 'true')
+	*将分割后的对象objects添加进分类器对应的分类Classes[J]中
+	count_obj (Objects, Number)
+    *提取特征（圆度）
+    for N := 1 to Number by 1
+      select_obj (Objects, Region, N)
+      circularity (Region, Circularity)
+      add_sample_class_mlp (MLPHandle, Circularity,Classes[J])
+    endfor
+    stop()
+	disp_continue_message (WindowHandle, 'black', 'true')
+endfor
+dev_clear_window ()
+disp_message (WindowHandle, 'Training...', 'window', 10, 10, 'black', 'true')
+*训练mlp分类器
+train_class_mlp (MLPHandle, 200, 1, 0.01, Error, ErrorLog)
+clear_samples_class_mlp (MLPHandle)
+
+*读取输入的待检测图像
+read_image (testImage, 'data/m5')
+rgb1_to_gray (testImage, GrayTestImage)
+*将图像进行分割
+threshold (GrayTestImage, darkTestRegion, 0, 105)
+connection (darkTestRegion, ConnectedTestRegions)
+select_shape (ConnectedTestRegions, SelectedTestRegions, 'area', 'and', 1500, 99999)
+fill_up (SelectedTestRegions, testObjects)
+*将分割后的对象objects进行分类
+count_obj (testObjects, Number)
+Classes := []
+Colors := ['yellow','magenta']
+dev_set_colored (6)
+dev_display (testImage)
+*提取特征（圆度）
+for J := 1 to Number by 1
+    select_obj (testObjects, singleRegion, J)
+    circularity (singleRegion, Circularity)
+    classify_class_mlp (MLPHandle, Circularity, 1, Class, Confidence)
+    Classes := [Classes,Class]
+    dev_set_color (Colors[Classes[J-1]])
+    dev_display (singleRegion)
+endfor
+
+*清除MLP分类器，释放内存
+clear_class_mlp (MLPHandle)

@@ -1,0 +1,34 @@
+*关闭当前屏幕的窗口
+dev_close_window ()
+*读取图像，创建新窗口
+read_image (Image, 'data/cloth3')
+get_image_size (Image, Width, Height)
+dev_open_window (0, 0, Width/2, Height/2, 'black', WindowHandle)
+dev_set_draw ('margin')
+dev_set_line_width (3)
+dev_set_color ('red')
+*读取检测图像
+rgb1_to_gray (Image, ImageGray)
+*使用muti_image算子对灰度图像做了乘法运算
+*增强了图像的对比度
+mult_image(ImageGray, ImageGray, ImageResult,0.01, 0) 
+*创建一个正弦形状的带通滤波器，用于消除背景的纹理图像。
+*其第二个参数决定了正弦的最大值，需要能在平滑背景的同时较好的提取出缺陷点
+gen_sin_bandpass (ImageBandpass, 0.2, 'none', 'rft', Width, Height)
+*对图像进行傅里叶变换，平滑以及还原
+rft_generic (ImageResult, ImageFFT, 'to_freq', 'none', 'complex', Width)
+convol_fft (ImageFFT, ImageBandpass, ImageConvol)
+rft_generic (ImageConvol, ImageFiltered, 'from_freq', 'n','byte', Width)
+*使用纹理滤波器提取缺陷部位
+texture_laws (ImageFiltered, ImageTexture, 'el',3, 5)
+*使用阈值处理等方式，根据灰度差异将缺陷部位选择出来
+threshold (ImageTexture, Imagelight, 150, 255)
+connection (Imagelight, ConnectedRegions)
+*根据形状的面积选择最大的区域
+select_shape_std (ConnectedRegions, SelectedRegion, 'max_area', 70)
+area_center (SelectedRegion, Area, Row, Column)
+gen_circle (Circle, Row, Column, 30)
+*显示缺陷检测结果
+dev_clear_window()
+dev_display(ImageGray)
+dev_display (Circle)

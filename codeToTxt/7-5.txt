@@ -1,0 +1,22 @@
+read_image(Image, 'data/cloth')
+*将图像分解成RGB三个通道
+decompose3 (Image, Image1, Image2, Image3)
+*将RGB三个通道的图像，转化为HSV图像空间
+trans_from_rgb (Image1, Image2, Image3, ImageResult1, ImageResult2, ImageResult3, 'hsv')
+*进行纹理检测。
+*其中选择的滤波器类型是‘ls’，即行方向用‘level’，列方向用‘spot’进行检测。
+*这种滤波器类型适合检测垂直方向上的缺陷。
+texture_laws (ImageResult2, ImageTextureLS, 'ls', 2, 7) 
+*对滤波器处理后的图像进行均值化，使图像更平滑，缺陷区域明显
+mean_image (ImageTextureLS, ImageMean, 11, 11)
+*对检测出的缺陷区域进行形态学处理并显示出来
+threshold (ImageMean, Regions, 60, 255)
+*将符合条件的区域分隔成独立区域
+connection(Regions, ConnectedRegions)
+*计算各区域的面积，提取出面积最大的区域
+area_center (ConnectedRegions, Area, Row, Column)
+select_shape (ConnectedRegions, SelectedRegions, 'area', 'and', max(Area), 99999) 
+*做闭运算，提取出缺陷区域
+closing_circle(SelectedRegions, RegionClosing, 11.5)
+dev_clear_window ()
+dev_display (RegionClosing)

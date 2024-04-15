@@ -1,0 +1,9 @@
+*输入待检测的木材图像
+read_image (Image, 'data/woodboard')
+*将原始图转化为灰度图。便与后续的平滑处理
+rgb1_to_gray (Image, GrayImage)
+*对单通道图像进行高斯平滑处理，以去除噪声
+gauss_filter (GrayImage, ImageGauss, 11)
+*对高斯平滑后的图像进行分水岭处理，阈值分割，提取出盆地区域
+watersheds (ImageGauss, Basins1, Watersheds)
+watersheds_threshold(ImageGauss, Basins, 50)

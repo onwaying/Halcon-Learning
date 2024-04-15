@@ -1,0 +1,47 @@
+dev_close_window()
+read_image (Image, 'data/modelWords')
+get_image_size(Image,width,height)
+dev_open_window (0, 0, width, height, 'black', WindowHandle)
+rgb1_to_gray (Image, GrayImage)  
+gen_empty_obj (EmptyObject)
+for Index := 1 to 4 by 1
+	disp_message (WindowHandle, '请框选单个汉字区域，右键确认：','window', 12, 12, 'yellow', 'false')
+	draw_rectangle1 (WindowHandle, Row1, Column1, Row2, Column2)
+	 **根据画的矩形生成对应的矩形
+	gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)
+	reduce_domain (GrayImage, Rectangle, ImageReduced1)
+	 *阈值处理
+	threshold (ImageReduced1, Region1, 128, 255)
+	 *准备接收所有提取的字符区域
+	concat_obj (EmptyObject, Region1, EmptyObject)
+endfor
+words:=['艺','术','中','心']
+*排序
+sort_region (EmptyObject, SortedRegions1, 'character', 'true', 'row')
+for Index1:=1 to 4 by 1
+select_obj (SortedRegions1, ObjectSelected1, Index1)
+append_ocr_trainf (ObjectSelected1, Image, words[Index1-1], 'data/yszx.trf')
+endfor
+read_ocr_trainf_names ('data/yszx.trf', CharacterNames, CharacterCount)
+create_ocr_class_mlp (50, 60, 'constant', 'default', CharacterNames, 80, 'none', 10, 42, OCRHandle)
+trainf_ocr_class_mlp (OCRHandle, 'data/yszx.trf', 200, 1, 0.01, Error, ErrorLog)
+write_ocr_class_mlp (OCRHandle, 'data/yszx.omc')
+*导入另一张做测试的图
+read_image (ImageTest, 'data/testWords.jpg')
+rgb1_to_gray (ImageTest, Image1)
+threshold (Image1, testwordregion, 125, 255)
+*对符合条件的字符区域进行分割
+connection (testwordregion, ConnectedwordRegions)
+*筛选符合条件的字符形状区域
+select_shape (ConnectedwordRegions, SelectedwordRegions, 'area', 'and', 700, 2500)
+*从左到右，排序
+sort_region (SelectedwordRegions, SortedRegions2, 'upper_left', 'true', 'column')
+count_obj(SortedRegions2, Number)
+*开始字符识别
+read_ocr_class_mlp ('data/yszx.omc', OCRHandle1)
+do_ocr_multi_class_mlp (SortedRegions2, Image1, OCRHandle1, Class, Confidence)
+*显示结果
+disp_message(WindowHandle, '识别结果：', 'image', 10, 10, 'white', 'false')
+for i:=1 to 4 by 1
+	disp_message(WindowHandle, Class[i-1], 'image', 90, 60*i, 'yellow', 'false')
+endfor

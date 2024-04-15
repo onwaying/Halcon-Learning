@@ -1,0 +1,5 @@
+read_image (Image, 'data/beads.jpg')
+decompose3 (Image, Red, Green, Blue)
+sub_image (Blue, Red, BlueSubRed, 1, 128)
+sub_image (BlueSubRed, Green, BlueSubRedGreen, 1, 128)
+threshold (BlueSubRedGreen, BlueRegion, 230, 255)

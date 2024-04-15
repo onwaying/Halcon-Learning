@@ -1,0 +1,9 @@
+read_image (Image, 'data/garlic')
+*将图像转换为灰度
+rgb1_to_gray (Image, GrayImage)
+*使用平滑滤波器对原始图像进行适当平滑
+mean_image (GrayImage, ImageMean, 30,30)
+*动态阈值分割，提取字符区域
+dyn_threshold (GrayImage, ImageMean, RegionDynThresh, 30, 'not_equal')
+*腐蚀操作，去除杂点
+erosion_circle (RegionDynThresh, RegionClosing, 1.5)

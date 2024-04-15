@@ -1,0 +1,4 @@
+read_image (Image, 'data/flower')
+laplace_of_gauss(Image,Laplace,2.0)
+zero_crossing(Laplace,ZeroCrossings)
+

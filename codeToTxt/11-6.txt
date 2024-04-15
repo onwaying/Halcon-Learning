@@ -1,0 +1,58 @@
+dev_close_window ()
+*读取参考图像，这里的参考图像应只包含识别的关键区域，用于创建模板
+read_image (ImageLabel, 'data/labelShape-0')
+*设置窗口参数用于显示图像
+get_image_size (ImageLabel, Width, Height)
+dev_open_window (0, 0, Width, Height, 'black', WindowHandle1)
+dev_set_draw ('margin')
+dev_display (ImageLabel)
+*设置用于存储特征点和感兴趣区域的变量
+NumPoints := []
+RowRoi := [10,10,Height - 10,Height - 10]
+ColRoi := [10,Width - 10,Width - 10,10]
+*将参考图像中的除边缘外的区域都设为感兴趣区域。因为参考图像已经近似于匹配的纹理样本
+gen_rectangle1 (Rectangle, 10, 10, Height - 10, Width - 10)
+*显示参考图像上选择的ROI区域
+dev_set_line_width (4)
+dev_display (Rectangle)
+stop ()
+*将感兴趣区域剪裁为模板图像
+reduce_domain (ImageLabel, Rectangle, ImageReduced)
+dev_clear_window ()
+dev_display (ImageLabel)
+*创建基于描述符的模板
+create_uncalib_descriptor_model (ImageReduced, 'harris_binomial', [], [], ['min_rot','max_rot','min_scale','max_scale'], [-90,90,0.2,1.1], 42, ModelID)
+*设置模型的原点，为了后面获取坐标作参照
+set_descriptor_model_origin (ModelID, -Height / 2, -Width / 2)
+*获取模型中特征点的位置
+get_descriptor_model_points (ModelID, 'model', 'all', Row_D, Col_D)
+*将模型中计算出的特征点存入NumPoints变量中
+NumPoints := [NumPoints,|Row_D|]
+
+*读取测试图像，这里读取的是单通道灰度图像，因此省略了通道转化的步骤
+read_image (ImageGray, 'data/labelShape-1')
+dev_resize_window_fit_image (ImageGray, 0, 0, -1, -1)
+dev_display (ImageGray)
+*对描述符特征点进行匹配
+find_uncalib_descriptor_model (ImageGray, ModelID, 'threshold', 800, ['min_score_descr','guided_matching'], [0.003,'on'], 0.25, 1, 'num_points', HomMat2D, Score)
+*显示匹配结果，将特征点用不同的颜色绘制出来
+if ((|HomMat2D| > 0) and (Score > NumPoints[0] / 4))
+    get_descriptor_model_points (ModelID, 'search', 0, Row, Col)
+	*创建十字标识符
+    gen_cross_contour_xld (Cross, Row, Col, 6, 0.785398)
+    projective_trans_region (Rectangle, TransRegion, HomMat2D, 'bilinear')
+    projective_trans_pixel (HomMat2D, RowRoi, ColRoi, RowTrans, ColTrans)
+    angle_ll (RowTrans[2], ColTrans[2], RowTrans[1], ColTrans[1], RowTrans[1], ColTrans[1], RowTrans[0], ColTrans[0], Angle)
+    Angle := deg(Angle)
+    if (Angle > 70 and Angle < 110)
+        area_center (TransRegion, Area, Row, Column)
+        dev_set_color ('green')
+        dev_set_line_width (4)
+        dev_display (TransRegion)
+        dev_set_colored (6)
+        dev_display (Cross)                
+   endif
+endif
+stop ()
+*匹配结束，释放模板资源
+clear_descriptor_model (ModelID)

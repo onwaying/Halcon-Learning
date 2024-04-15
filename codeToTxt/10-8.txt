@@ -1,0 +1,11 @@
+read_image (Image, 'data/flower') 
+rgb1_to_gray (Image, GrayImage)
+dev_open_window (0, 512, 512, 512, 'black', WindowHandle1)
+*进行边缘检测
+lines_gauss(GrayImage,Lines,1.5,1,8,'light','true','bar-shaped','true')
+*在窗口将轮廓线条绘制出来
+dev_set_color ('red')
+dev_clear_window()
+dev_display (Lines)
+
+

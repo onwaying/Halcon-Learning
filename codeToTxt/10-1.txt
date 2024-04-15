@@ -1,0 +1,7 @@
+read_image(Image,'data/flower')
+rgb1_to_gray (Image, GrayImage)
+sobel_amp(GrayImage,Amp,'sum_abs',3)
+threshold(Amp,Edg,100,255)
+skeleton (Edg, Skeleton)
+dev_clear_window ()
+dev_display (Skeleton)

@@ -1,0 +1,14 @@
+read_image (board, 'data/boardEqu')
+rgb1_to_gray (board, GrayImage)
+equ_histo_image (GrayImage, ImageEquHisto)
+*显示直方图
+gray_histo (board, board, AbsoluteHisto1, RelativeHisto1)
+gray_histo (ImageEquHisto, ImageEquHisto, AbsoluteHisto2, RelativeHisto2)
+dev_open_window (0, 0, 512, 512, 'black', WindowHandle)
+dev_set_color ('red')
+gen_region_histo (Histo1, AbsoluteHisto1, 255, 5, 1)
+dev_set_color ('green')
+gen_region_histo (Histo2, AbsoluteHisto2, 255, 450, 1)
+
+
+

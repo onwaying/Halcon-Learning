@@ -1,0 +1,13 @@
+read_image (Image, 'data/flower') 
+*转换为单通道灰色图像
+rgb1_to_gray (Image, GrayImage)
+*进行亚像素边缘提取。分别使用了不同的滞后阈值以便进行对比
+edges_sub_pix (GrayImage, Edges1, 'lanser2', 0.5, 5, 50) 
+edges_sub_pix (GrayImage, Edges2, 'lanser2', 0.5, 25, 50) 
+edges_sub_pix (GrayImage, Edges3, 'lanser2', 0.5, 5, 25) 
+*将提取结果显示在窗口中
+dev_display (Edges1) 
+stop()
+dev_display (Edges2)
+stop()
+dev_display (Edges3)

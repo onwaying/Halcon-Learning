@@ -1,0 +1,14 @@
+*清空显示窗口
+dev_close_window ()
+*读取包含孔洞的图片
+read_image (Image, 'data/holes2')
+*打开新的显示窗口
+dev_open_window_fit_image (Image, 0, 0, -1, -1, WindowHandle)
+*将彩色图像转化为灰度图像，这是为了后面的图像二值化
+rgb1_to_gray (Image, GrayImage)
+*进行阈值处理，提取出图中较亮的有封闭区域的（孔洞以外）背景区域
+threshold (GrayImage, Region, 50,255)
+*将背景区域作为area_holes算子的输入，计算所有孔洞的面积
+area_holes (Region, Area)
+*将面积计算结果以字符串形式显示在窗口中
+disp_message (WindowHandle, 'Size of holes: ' + Area + ' pixel', 'window', 10, 10, 'black', 'true')

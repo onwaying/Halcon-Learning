@@ -1,0 +1,15 @@
+read_image (Image, 'data/m105')
+*将原始图像进行通道分离，得到红绿蓝三个分量的图像	
+decompose3 (Image, Red, Green, Blue)
+*将RGB三个分量的图像转化为H（色调）、S（饱和度）、V（明度）的图像
+trans_from_rgb (Red, Green, Blue, ImageResultH, ImageResultS, ImageResultI, 'hsv')
+*对饱和度图像阈值处理，分割出高饱和度区域，即字符区域的大致范围
+threshold (ImageResultS, High, 192,255)
+*区域分割，
+reduce_domain (ImageResultH, High, ImageReduced)
+*并进行膨胀操作
+dilation_circle (ImageReduced, RegionDilation, 3.5)
+*开运算，使边缘更清晰
+opening_circle (RegionDilation, RegionChars, 5.5)
+dev_clear_window ()
+dev_display (RegionChars)

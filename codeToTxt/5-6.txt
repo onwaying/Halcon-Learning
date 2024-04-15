@@ -1,0 +1,4 @@
+read_image (text, 'data/text.jpg')
+scale_image_max (text, ImageScaleMax)
+dev_display(ImageScaleMax)
+

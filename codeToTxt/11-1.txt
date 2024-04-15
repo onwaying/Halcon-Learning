@@ -1,0 +1,30 @@
+dev_close_window ()
+dev_open_window (0, 0, 599, 464, 'black', WindowID)
+*读取了一幅彩色图像
+read_image (Imagecolor, 'data/holesBoard')
+*将其转化为灰度图像
+rgb1_to_gray (Imagecolor, Image)
+dev_set_draw ('margin')
+dev_set_line_width(3)
+Row1 :=700
+Column1 := 950
+Row2 := 906
+Column2 := 1155
+*选择了一块矩形的ROI区域
+gen_rectangle1 (Rectangle, Row1, Column1, Row2, Column2)
+dev_display (Rectangle)
+*将ROI区域进行裁剪，变成模板图像
+reduce_domain (Image, Rectangle, ImageReduced)
+*创建模板，因为光照比较稳定，GrayValues选择‘original’
+create_template (ImageReduced, 5, 4, 'sort', 'original', TemplateID)	
+*读取测试图像
+read_image (ImageNoise, 'data/holesBoardNoise')
+*应用灰度模板并进行匹配
+adapt_template (ImageNoise, TemplateID)
+best_match_mg (ImageNoise, TemplateID, 35, 'false', 4, 'all', Row_, Column_, Error_)
+dev_clear_window ()
+dev_display (ImageNoise)
+*根据匹配返回的坐标中心，绘制矩形标识框，将匹配到的目标框选出来
+disp_rectangle2 (WindowID, Row_, Column_, 0, 95, 95)
+*匹配结束，释放模板资源
+clear_template (TemplateID)

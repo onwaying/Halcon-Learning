@@ -1,0 +1,14 @@
+*使用相机参数校正畸变
+* CameraParameters为相机的内部参数
+CameraParameters := [0.0271606, -518.0, 1.48e-005, 1.48e-005, 271.343, 260.681, 640, 480]
+* CameraPose为相机的外部参数，即位姿
+CameraPose := [0.258487, -0.018, 4.954, 2.0, 14.0, 2.4, 0]
+scaleParam := 1920/1080.0
+*读取待校正的图像
+read_image (Image, 'data/chess')
+*调整原点的位姿
+set_origin_pose (CameraPose, -1,-0.7, 0, rectificationPose)
+*生成用于校正的映射图，用来描述图像坐标系与世界坐标系之间的映射
+gen_image_to_world_plane_map(rectificationMap,CameraParameters, rectificationPose, 640, 480, 640, 480, scaleParam/ 640, 'bilinear')
+*利用映射图rectificationMap进行图像的校正
+map_image (Image, rectificationMap, rectifiedImage)

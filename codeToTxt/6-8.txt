@@ -1,0 +1,4 @@
+read_image (Char, 'data/char')
+rgb1_to_gray (Char, GrayImage)
+char_threshold (GrayImage, GrayImage, Characters, 6, 95, Threshold)
+

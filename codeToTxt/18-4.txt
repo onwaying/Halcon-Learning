@@ -1,0 +1,12 @@
+read_image(ImageRec1,'data/stereo-left')
+read_image(ImageRec2,'data/stereo-right')
+binocular_disparity (ImageRec1, ImageRec2, Disparity, Score, 'ncc', 11, 11, 0, -150, 30, 4, 0.6, 'none', 'none')
+*将整幅视差图像转换为3d点图。
+*计算后输出的三张图，三张图的灰度分别表示视差图中的对应位置的点在X, Y, Z轴的坐标
+CamParamRect1 := [0.0121606, 0.0, 1.48e-005, 1.48e-005, -101.343, 120.681, 337, 242]
+CamParamRect2:=[0.0121606, 0.0, 1.48e-005, 1.48e-005, 546.365, 120.681, 364, 242]
+Cam1PoseRect1:=[0.158487, 0.0, 0.0, 0.0, 0.0, 0.0, 0]
+disparity_image_to_xyz(Disparity, ImgX, ImgY, ImgZ,CamParamRect1, CamParamRect2, Cam1PoseRect1) 
+*释放相机资源
+*close_framegrabber(AcqHandle1)
+*close_framegrabber(AcqHandle2)

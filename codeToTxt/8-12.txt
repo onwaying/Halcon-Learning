@@ -1,0 +1,32 @@
+dev_close_window ()
+*读取图像，将其转化为灰度图像并显示出来	
+read_image (Image, 'data/logs')
+get_image_size (Image, Width, Height)
+rgb1_to_gray(Image,grayImage)
+*进行全局阈值分割，将亮色区域提取出来
+threshold (grayImage, Bright, 60, 255)
+*开运算去除边缘毛刺
+opening_rectangle1 (Bright, Cut, 1, 7)
+*将非连通区域分割成独立区域
+connection (Cut, ConnectedRegions)
+*根据面积选择表示截面比较小的木材的区域	
+select_shape (ConnectedRegions, smallRegions, 'area', 'and', 500, 20000)
+*对粘连区域做腐蚀操作，根据腐蚀的情况和面积，选出截面区域
+*count_obj(SelectedRegions2,number1)
+*根据面积选择表示截面比较大的木材的区域，可能有粘连和区域重叠的情况	
+select_shape (ConnectedRegions, largeRegions, 'area', 'and', 20000, 1000000)
+erosion_circle(largeRegions,erisionedLargeRegions,8.5)
+*将非连通区域分割成独立区域
+connection (erisionedLargeRegions, ConnectedRegions2)
+*再次选择符合面积条件的区域，排除杂点
+select_shape (ConnectedRegions2, SelectedRegions3, 'area', 'and', 150, 200000)
+*区域合并
+concat_obj(smallRegions, SelectedRegions3, ObjectsConcat)
+*区域计数
+count_obj(ObjectsConcat,number3)
+*创建窗口用于显示结果
+dev_open_window (0, 0, Width, Height, 'black', WindowHandle)
+dev_display(ObjectsConcat)
+set_display_font (WindowHandle,18, 'mono', 'true', 'true')
+*显示计数的结果，程序结束
+disp_message(WindowHandle, 'Number of logs : '+number3, 'image', 30, 50, 'blue', 'true')

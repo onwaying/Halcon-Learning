@@ -1,0 +1,32 @@
+*读取参考的原始图像。如果是彩色的，需要先转化为单通道灰度图像
+read_image (Image, 'data/carmex-0')
+get_image_size (Image, Width, Height)
+dev_close_window ()
+dev_open_window (0, 0, Width, Height, 'black', WindowHandle)
+*设置窗口绘制参数，线宽设为3
+dev_set_line_width(3)
+dev_set_draw ('margin')
+*创建圆形，因为目标区域是圆形，因为用圆形将ROI区域选择出来
+gen_circle (Circle, 161, 208, 80)
+*获取圆形的中心点，为匹配后的可视化显示结果做准备
+area_center (Circle, Area, RowRef, ColumnRef)
+*裁剪ROI区域，得到模板图像
+reduce_domain (Image, Circle, ImageReduced)
+*创建基于相关性的匹配模型，输入模板图像和模型参数
+create_ncc_model (ImageReduced, 'auto', 0, 0, 'auto', 'use_polarity', ModelID)
+*显示原始图像和圆形框
+dev_display (Image)
+dev_display (Circle)
+stop ()
+*读取测试图像。该测试图像和参考图像比起来有轻微的位移，旋转，缩放，以及失焦
+read_image (Image2, 'data/carmex-1')
+*进行行基于相关性的模板匹配
+find_ncc_model (Image2, ModelID, 0, 0, 0.5, 1, 0.5, 'true', 0, Row, Column, Angle, Score)
+vector_angle_to_rigid (RowRef, ColumnRef, 0, Row, Column, 0, HomMat2D)
+*对圆形进行仿射变换，使其将匹配的结果目标标识出来
+affine_trans_region (Circle, RegionAffineTrans, HomMat2D, 'nearest_neighbor')
+*显示测试画面和圆形标记圈
+dev_display (Image2)
+dev_display (RegionAffineTrans)
+*匹配结束，释放模板资源
+clear_ncc_model (ModelID)

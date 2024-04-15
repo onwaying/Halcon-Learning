@@ -1,0 +1,10 @@
+read_image (Image, 'data/board')
+rgb1_to_gray (Image, GrayImage)
+threshold (GrayImage, Region, 100, 255)
+erosion_circle (Region, RegionErosion, 7.5)
+erosion_circle (RegionErosion, RegionErosion2, 6.5)
+erosion_circle (RegionErosion2, RegionErosion3, 5.5)
+*膨胀操作
+dilation_circle (RegionErosion3, RegionDilation, 23.5)
+dev_clear_window ()
+dev_display (RegionDilation)

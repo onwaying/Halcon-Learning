@@ -1,0 +1,32 @@
+*清空当前窗口
+dev_close_window ()
+read_image (Image, 'data/cloth2')
+get_image_size (Image, Width, Height)
+*创建窗口并设置窗口绘制参数
+dev_open_window (0, 0, Width/2, Height/2, 'black', WindowHandle)
+dev_set_draw ('margin')
+dev_set_line_width (4)
+dev_set_color ('red')
+*创建一个高斯滤波器，用于将傅里叶转换后的图像进行滤波
+gen_gauss_filter (GaussFilter, 3.0, 3.0, 0.0, 'none', 'rft', Width, Height)
+*开始检测，读取图像
+rgb1_to_gray (Image, ImageGray)
+*对图像进行傅里叶变换，平滑以及还原
+rft_generic (ImageGray, ImageFFT, 'to_freq', 'none', 'complex', Width)
+convol_fft (ImageFFT, GaussFilter, ImageConvol)
+rft_generic (ImageConvol, ImageFiltered, 'from_freq', 'n', 'real', Width)
+*对还原后的图像进行阈值处理，提取出图中明显偏暗的部分，即瑕疵的位置
+threshold (ImageFiltered, ImageDark, 0, 85)
+*由于瑕疵部位可能不止一个，将其分离成独立的区域
+connection (ImageDark, ConnectedRegions)
+*获取瑕疵的数量。
+*如果对瑕疵的形状面积尺寸等有筛选要求的，
+*也可以在这一步之前加入selecct_shape算子进行判断
+count_obj (ConnectedRegions, Number)
+*逐个显示瑕疵的位置并以圆圈标记出来。
+for index := 1 to Number by 1
+	select_obj (ConnectedRegions, shape, index)
+	area_center (shape, Area, Row, Column)
+	gen_circle (Circle, Row, Column, 30)
+	dev_display (Circle)
+endfor

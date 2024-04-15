@@ -1,0 +1,21 @@
+dev_close_window ()	
+read_image (Image, 'data/garlic2')
+get_image_size (Image, Width, Height)
+dev_open_window (0, 0, Width/2, Height/2, 'black', WindowHandle)
+rgb1_to_gray (Image, GrayImage)
+*使阈值处理提取出了较暗的区域
+threshold (GrayImage, Region, 100, 255)
+*将非连通区域分割成一组区域的集合
+connection (Region, ConnectedRegions)
+*利用面积特征，将比较大快的区域分割出来
+select_shape(ConnectedRegions,selectRegion,'area','and',50000,200000)
+*求最小外接矩形
+smallest_rectangle2 (selectRegion, Row1, Column1, Phi, Length1, Length2)
+*根据矩形参数创建举行的轮廓
+gen_rectangle2_contour_xld (Rectangle1, Row1, Column1, Phi, Length1, Length2)
+*显示最小外接矩形
+dev_set_window (WindowHandle)
+dev_set_draw ('margin')
+dev_set_line_width (3)
+dev_display (Image)
+dev_display (Rectangle1)

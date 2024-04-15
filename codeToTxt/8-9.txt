@@ -1,0 +1,17 @@
+*读取一幅光照不均匀的亮背景图像，这里选取的是一幅彩色图像
+read_image (Image,'data/shapes')
+*变换之前转为灰度图像
+rgb1_to_gray (Image, GrayImage)
+*将图像通过阈值处理转化为二值化图像。
+threshold (GrayImage, Regions, 145, 255)
+*创建一个结构元素，这里创建的是一个圆形
+gen_circle(StructElement,10,10,100)
+*清空窗口便于显示结果
+dev_clear_window ()
+*进行底帽操作，提取出较暗区域
+bottom_hat (Regions, StructElement, RegionBottomHat)
+*将较暗区域从原图中提取出来
+reduce_domain (Image, RegionBottomHat, ImageReduced)
+
+dev_clear_window ()
+dev_display (ImageReduced)

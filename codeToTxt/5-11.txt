@@ -1,0 +1,14 @@
+read_image (test, 'data/label')
+*通道分离
+decompose3(test, image1, image2, image3)
+mean_image (image1, Mean1, 9, 9)
+emphasize (Mean1, em1, 5, 5, 1.5)
+illuminate (em1, ImageI1, 20, 20, 0.55)
+equ_histo_image (image2, ImageEquHisto2)
+equ_histo_image (image3, ImageEquHisto3)
+compose3 (ImageI1, ImageEquHisto2, ImageEquHisto3, MultiChannelImage)
+dev_display(MultiChannelImage)	
+
+
+
+

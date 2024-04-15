@@ -1,0 +1,3 @@
+read_image (Image,'data/shapes')
+rgb1_to_gray (Image, GrayImage)
+auto_threshold(GrayImage,Regions,8.0)

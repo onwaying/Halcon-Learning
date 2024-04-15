@@ -1,0 +1,4 @@
+read_image (ImageNoise, 'data/marker.jpg')
+median_image (ImageNoise, ImageMedian, 'circle', 3, 'continued')
+dev_display(ImageMedian)
+

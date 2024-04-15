@@ -1,0 +1,11 @@
+read_image (Image,'data/shapes')
+decompose3 (Image, Red, Green, Blue)
+trans_from_rgb (Red, Green, Blue, Hue, Saturation, Intensity, 'hsv')
+threshold (Saturation, Regions, 180, 255)
+gen_circle(StructElement,10,10,10)
+*清理显示窗口，以便显示结果
+dev_clear_window ()
+*清理显示窗口，以便显示结果
+bottom_hat (Regions, StructElement, RegionBottomHat)
+dev_clear_window ()
+dev_display (RegionBottomHat)

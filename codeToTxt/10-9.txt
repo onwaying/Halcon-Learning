@@ -1,0 +1,13 @@
+dev_close_window ()
+read_image (Image, 'data/shapes')
+rgb1_to_gray (Image, GrayImage)
+get_image_size (Image, Width, Height)
+dev_open_window (0, 0, Width , Height, 'black', WindowHandle)
+*提取出的亚像素边缘edge的图像，得到了一个初始的轮廓
+edges_sub_pix (GrayImage, Edges, 'canny', 2.5, 15, 40)
+*对上一步的轮廓进行分割
+segment_contours_xld (Edges, ContoursSplit, 'lines_circles', 5, 4, 2)
+*提取出轮廓中较长的部分线段
+select_contours_xld (ContoursSplit, SelectedContours, 'contour_length', 20, Width / 2, -0.5, 0.5)
+*对相邻的轮廓段进行连接
+union_adjacent_contours_xld (SelectedContours, UnionContours, 20, 1, 'attr_keep')

@@ -1,0 +1,9 @@
+read_image (Image, 'data/flower') 
+*使用canny算子进行亚像素边缘提取
+edges_color_sub_pix (Image, Edges1, 'canny', 0.5, 5, 50)
+*使用canny算子进行亚像素边缘提取
+edges_color_sub_pix (Image, Edges2, 'sobel_fast', 0.5, 40, 70)
+dev_clear_window ()
+dev_display (Edges1) 
+dev_display (Edges2)
+

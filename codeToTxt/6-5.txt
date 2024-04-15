@@ -1,0 +1,13 @@
+read_image (Image, 'data/text.jpg')
+*将图像转换为灰度
+rgb1_to_gray (Image, GrayImage)
+*由于图像对比度比较低，对图像进行相乘，增强对比度
+mult_image (GrayImage, GrayImage, ImageResult, 0.005, 0)
+*使用平滑滤波器对原始图像进行适当平滑
+mean_image (ImageResult, ImageMean, 50,50)
+*动态阈值分割，提取字符区域
+dyn_threshold (ImageResult, ImageMean, RegionDynThresh, 4, 'not_equal')
+*开运算，去除无意义的小的杂点
+opening_circle (RegionDynThresh, RegionOpening, 1.5)
+dev_clear_window()
+dev_display (RegionOpening)

@@ -1,0 +1,3 @@
+read_image (ImageNoise, 'data/marker.jpg')
+mean_image (ImageNoise, ImageMean, 9,9)
+dev_display(ImageMean)	

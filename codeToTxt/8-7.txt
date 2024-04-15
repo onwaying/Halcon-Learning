@@ -1,0 +1,13 @@
+read_image (Image,'data/board') 
+rgb1_to_gray(Image, GrayImage)
+gen_rectangle1 (Rectangle, 259, 87, 957, 909)
+reduce_domain (GrayImage, Rectangle, ImageReduced)
+threshold(ImageReduced,Light,85,255)
+gen_circle(StructElement,6,6,7)
+*清理显示窗口，以便显示结果
+dev_clear_window ()
+*进行顶帽运算，得到了开运算中移除的局部像素并高亮显示
+top_hat (Light, StructElement, RegionTopHat)
+
+dev_clear_window ()
+dev_display (RegionTopHat)

@@ -1,0 +1,7 @@
+read_image (Image,'data/holes.jpg')
+rgb1_to_gray (Image, GrayImage)
+*设置矩形，选择感兴趣区域
+gen_rectangle1 (Rectangle, 170, 80, 370, 510)
+reduce_domain (GrayImage, Rectangle, ImageReduced)
+var_threshold (ImageReduced, Region, 15, 15, 0.2, 35, 'dark')
+

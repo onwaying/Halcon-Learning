@@ -1,0 +1,31 @@
+*清空当前窗口
+dev_close_window ()
+*读取测试图像
+read_image (Image, 'data/cloth1')
+*获取图像的宽
+get_image_size (Image, Width, Height)
+*创建显示窗口，并设置窗口及绘制参数
+dev_open_window (0, 0, Width, Height, 'black', WindowHandle)
+dev_set_draw ('margin')
+dev_set_line_width (3)
+dev_set_color ('red')
+*创建一个高斯滤波器，用于将傅里叶转换后的图像进行滤波
+gen_gauss_filter (GaussFilter, 3.0, 3.0, 0.0, 'none', 'rft', Width, Height)
+*开始检测
+*将测试图像转化为单通道的灰度图像
+rgb1_to_gray (Image, ImageGray)
+*对灰度图像进行颜色反转
+invert_image (ImageGray, ImageInvert)
+*对反转后的图像进行傅里叶变换
+rft_generic (ImageInvert, ImageFFT, 'to_freq', 'none', 'complex', Width)
+*对傅里叶图像做卷积，使用之前创建的高斯滤波器作为卷积核
+convol_fft (ImageFFT, GaussFilter, ImageConvol)
+*将卷积后的傅里叶图像还原为空间域图像。可见图像的突变部分得到了增强
+rft_generic (ImageConvol, ImageFiltered, 'from_freq', 'n', 'real', Width)
+*设置提取线条的参数
+calculate_lines_gauss_parameters (17, [25,3], Sigma, Low, High)
+*将图像中的有灰度差异的线条提取出来
+lines_gauss (ImageFiltered, Lines, Sigma, Low, High, 'dark', 'true', 'gaussian', 'true')
+*将提取出的结果显示出来
+dev_display (Image)
+dev_display (Lines)
